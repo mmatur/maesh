@@ -1,0 +1,25 @@
+version: v1.0
+name: Go
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Build
+    task:
+      prologue:
+        commands:
+          - sem-version go 1.13
+          - export GO111MODULE=on
+          - export GOPATH=~/go
+          - export "SEMAPHORE_GIT_DIR=$(go env GOPATH)/src/github.com/${SEMAPHORE_PROJECT_NAME}"
+          - export "PATH=$(go env GOPATH)/bin:${PATH}"
+          - mkdir -vp "${SEMAPHORE_GIT_DIR}" "$(go env GOPATH)/bin"
+          - checkout
+      jobs:
+        - name: Build
+          commands:
+            - make
+        - name: Tests
+          commands:
+            - make test-integration
